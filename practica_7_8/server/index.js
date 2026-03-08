@@ -368,7 +368,6 @@ app.post('/authentication/login', async (req, res) => {
 
   res.status(200).json({
     login: true,
-    ...safe_user,
     token: accessToken,
   });
 });

@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './styles/ProductCard.module.scss';
-import ProductForm from './ProductForm';
 
 function ProductList({
   products,
   onEdit,
   onDelete,
-  editingProduct,
-  onUpdate,
-  onCancelEdit,
-  onAdd
+  onAdd,
+  token
 }) {
   const [searchId, setSearchId] = useState('');
-  const [showForm, setShowForm] = useState(false);
 
   const filteredProducts = searchId.trim()
     ? products.filter(p => String(p.id) === searchId.trim())
@@ -25,27 +21,15 @@ function ProductList({
       setSearchId(value);
     }
   };
-// очистка поиска
+
   const clearSearch = () => {
     setSearchId('');
   };
 
-  const isFormVisible = showForm || !!editingProduct;
-
-  // Открытие формы добавления
-  const openAddForm = () => {
-    setShowForm(true);
-  };
-
-  // Закрытие формы
-  const closeForm = () => {
-    setShowForm(false);
-    if (editingProduct) onCancelEdit();
-  };
-
   return (
     <div>
-      <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      {/* Поиск */}
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'flex-start', gap: '1rem', alignItems: 'center' }}>
         <div>
           <label htmlFor="search-id" style={{ marginRight: '0.8rem', fontWeight: 500 }}>
             Поиск по ID:
@@ -86,50 +70,32 @@ function ProductList({
         </div>
       </div>
 
-      <div style={{ marginBottom: '2rem' }}>
-        {!isFormVisible && (
-          <button
-            onClick={openAddForm}
-            style={{ 
-              padding: '0.7rem 1.4rem',
-              marginTop: '1rem',
-              background: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
-          >
-            + Добавить товар
-          </button>
-        )}
+      {/* Кнопка добавления*/}
+      <button
+        className={`${styles.onAdd} onAdd`}
+        onClick={() => {
+          if (!token) {
+            alert('Войдите в аккаунт, чтобы добавить товар');
+            return;
+          }
+          onAdd();
+        }}
+        disabled={!token}
+        style={{
+          padding: '0.7rem 1.4rem',
+          marginBottom: '2rem',
+          background: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          opacity: token ? 1 : 0.6
+        }}
+      >
+        + Добавить товар
+      </button>
 
-        {isFormVisible && (
-          <>
-            <button
-              onClick={closeForm}
-              style={{
-                marginTop: '1rem',
-                padding: '0.7rem 1.4rem',
-                background: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-              }}
-            >
-              Скрыть форму
-            </button>
-
-            <ProductForm
-              onSubmit={editingProduct ? onUpdate : onAdd}
-              initialData={editingProduct || null}
-              onCancel={closeForm}
-            />
-          </>
-        )}
-      </div>
-
+      {/* Список товаров */}
       {filteredProducts.length === 0 && searchId ? (
         <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
           Товар с ID <strong>{searchId}</strong> не найден
@@ -177,14 +143,29 @@ function ProductList({
               <div style={{ marginTop: '1rem' }}>
                 <button
                   className={`${styles.edit} edit`}
-                  onClick={() => onEdit(product)}
+                  onClick={() => {
+                    if (!token) {
+                      alert('Войдите в аккаунт, чтобы редактировать товар');
+                      return;
+                    }
+                    onEdit(product);
+                  }}
+                  disabled={!token}
+                  style={{ opacity: token ? 1 : 0.6 }}
                 >
                   Редактировать
                 </button>
                 <button
                   className={`${styles.delete} delete`}
-                  onClick={() => onDelete(product.id)}
-                  style={{ marginLeft: '0.8rem' }}
+                  onClick={() => {
+                    if (!token) {
+                      alert('Войдите в аккаунт, чтобы удалить товар');
+                      return;
+                    }
+                    onDelete(product.id);
+                  }}
+                  disabled={!token}
+                  style={{ marginLeft: '0.8rem', opacity: token ? 1 : 0.6 }}
                 >
                   Удалить
                 </button>

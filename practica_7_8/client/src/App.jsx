@@ -2,19 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 import ProductList from './ProductList';
-import ProductForm from './ProductForm';
 import ProductDetail from './ProductDetail';
 import Registration from './RegistrPage';
 import Login from './LoginPage';
+import ProductForm from './ProductForm';
 
 function App() {
   const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [token, setToken] = useState(null);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isProductFormOpen, setIsProductFormOpen] = useState(false);
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('authToken');
+    if (storedToken) setToken(storedToken);
+  }, []);
+
+  const handleLoginSuccess = (data) => {
+    if (data.token) {
+      localStorage.setItem('authToken', data.token);
+      setToken(data.token);
+    }
+    setIsLoginOpen(false);
+  };
+
 // загрузка продуктов
   const fetchProducts = async () => {
     try {
@@ -25,6 +43,15 @@ function App() {
       console.error('Ошибка загрузки продуктов:', err);
     }
   };
+
+  const handleRegister = (data) => {
+    if (data.token) {
+      localStorage.setItem('authToken', data.token);
+      setToken(data.token)
+    }
+    setIsRegisterOpen(false);
+  };
+  
 // создание продукта
   const createProduct = async (product) => {
     try {
@@ -45,20 +72,33 @@ function App() {
   };
 // изменение продукта
   const updateProduct = async (id, updatedProduct) => {
+    console.log('Id товара для обновления: ', id);
+    console.log('Данные, которые отправляем: ', updateProduct);
     try {
       const res = await fetch(`http://localhost:5000/products/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+         },
         body: JSON.stringify(updatedProduct),
       });
-      if (!res.ok) throw new Error('Ошибка обновления');
+
+      console.log('Статус ответа сервера: ', res.status);
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error('Ошибка от сервера: ', errData);
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
+
       const data = await res.json();
       setProducts(products.map(p => (p.id === id ? data : p)));
-      setShowForm(false);
+      setIsProductFormOpen(false);
       setEditingProduct(null);
     } catch (err) {
       console.error('Ошибка обновления:', err);
-      alert('Не удалось обновить товар');
+      alert('Не удалось обновить товар' + err.message);
     }
   };
 // удаление продукта
@@ -74,55 +114,80 @@ function App() {
   };
 
   // Открытие формы для добавления
-  const openAddForm = () => {
+  const openAddProduct = () => {
     setEditingProduct(null);
-    setShowForm(true);
+    setIsProductFormOpen(true);
   };
 
   // Открытие формы для редактирования
-  const startEdit = (product) => {
+  const openEditProduct = (product) => {
     setEditingProduct(product);
-    setShowForm(true);
+    setIsProductFormOpen(true);
   };
 
   // Закрытие формы
-  const closeForm = () => {
-    setShowForm(false);
+  const closeProductForm = () => {
+    setIsProductFormOpen(false);
     setEditingProduct(null);
+  };
+
+  const handleProductSubmit = (productData) => {
+    if (editingProduct) {
+      updateProduct(editingProduct.id, productData);
+    }
+    else {
+      createProduct(productData);
+    }
+    closeProductForm();
   };
 
   return (
     <BrowserRouter>
       <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-        <header style={{ marginBottom: '2rem' }}>
-          <h1>Electronics Store</h1>
+        <header style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '37rem'}}>
+          <h1 style={{ marginTop: '0.7rem'}}>Electronics Store</h1>
+          <div>
+            <button onClick={() => setIsRegisterOpen(true)} style={{marginRight: '1rem', padding: '0.6rem 1.2rem', background: '#28a745', color: 'white', border: 'none', borderRadius: '6px'}}>
+              Регистрация
+            </button>
+            <button onClick={() => setIsLoginOpen(true)} style={{padding: '0.6rem 1.2rem', background: '#007bff', color: 'white', border: 'none', borderRadius: '6px', marginRight: '0.5rem', cursor: 'pointer,'}}>
+              Войти
+            </button>
+          </div>
         </header>
 
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ProductList
-                products={products}
-                onEdit={startEdit}
-                onDelete={deleteProduct}
-                onAdd={createProduct}
-                onUpdate={(updated) => updateProduct(editingProduct?.id, updated)}
-                onCancel={closeForm}
-                onCancelEdit={closeForm}
-                showForm={openAddForm}
-                editingProduct={editingProduct}
-                onToggleForm={() => setShowForm(!openAddForm)}
-              />
-            }
-          />
+        <Registration
+          isOpen={isRegisterOpen}
+          onClose={() => setIsRegisterOpen(false)}
+          register={handleRegister}
+        />
 
+        <Login
+          isOpen={isLoginOpen}
+          onClose={() => setIsLoginOpen(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
+
+        <ProductList
+          products={products}
+          onEdit={openEditProduct}
+          onDelete={deleteProduct}
+          onAdd={openAddProduct}
+          token={token}
+        />
+
+        <ProductForm
+          isOpen={isProductFormOpen}
+          onSubmit={handleProductSubmit}
+          initialData={editingProduct}
+          onCancel={closeProductForm}
+        />
+
+        <Routes>
           <Route
             path="/product/:id"
             element={<ProductDetail products={products} />}
           />
-
-          <Route path="*" element={<h2>Страница не найдена (404)</h2>} />
         </Routes>
       </div>
     </BrowserRouter>
