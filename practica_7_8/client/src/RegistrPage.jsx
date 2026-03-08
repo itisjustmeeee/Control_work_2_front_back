@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
 
+// функция регистрации
 function Registration({ register, isOpen, onClose }) {
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');

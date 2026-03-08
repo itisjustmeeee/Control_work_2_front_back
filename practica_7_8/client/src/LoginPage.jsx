@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
 
+// функция входа
 function Login({ isOpen, onClose, onLoginSuccess }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

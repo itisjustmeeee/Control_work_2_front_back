@@ -20,11 +20,13 @@ function App() {
     fetchProducts();
   }, []);
 
+  // получение токена
   useEffect(() => {
     const storedToken = localStorage.getItem('authToken');
     if (storedToken) setToken(storedToken);
   }, []);
 
+  // подтверждение входа
   const handleLoginSuccess = (data) => {
     if (data.token) {
       localStorage.setItem('authToken', data.token);
@@ -44,6 +46,7 @@ function App() {
     }
   };
 
+  // подтверждение регистрации
   const handleRegister = (data) => {
     if (data.token) {
       localStorage.setItem('authToken', data.token);
