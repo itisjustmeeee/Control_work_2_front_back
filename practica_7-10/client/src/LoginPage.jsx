@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
+import { useAuth } from './context/AuthContext';
+import api from './api';
 
 Modal.setAppElement('#root');
 
 // функция входа
-function Login({ isOpen, onClose, onLoginSuccess }) {
+function Login({ isOpen, onClose }) {
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
@@ -16,33 +19,25 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
         setLoading(true);
 
         try {
-            const responce = await fetch('http://localhost:5000/authentication/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify({email, password}),
+            const response = await api.post('/authentication/login', {
+                email,
+                password,
             });
 
-            if (responce.ok) {
-                const data = await responce.json();
-                localStorage.setItem('authToken', data.token);
-                if (onLoginSuccess) {
-                    onLoginSuccess(data);
-                }
-                onClose();
-            }
-            else {
-                let errorData;
-                try {
-                    errorData = await responce.json();
-                }
-                catch {
-                    errorData = {error: `Сервер вернул статус ${responce.status}`};
-                }
-                Error(errorData.error || `Ошибка входа (${responce.status})`);
-            }
+            const data = response.data;
+
+            login(data.accessToken, data.refreshToken, {
+                id: data.id || data.user?.id,
+                email: data.email || data.user?.email,
+                first_name: data.first_name || data.user?.first_name,
+                last_name: data.last_name || data.user?.last_name
+            });
+
+            onClose();
         }
         catch (err) {
-            setError('Ошибка соединения с сервером');
+            const errorMsg = err.response?.data?.error || err.message || 'Ошибка входа';
+            setError(errorMsg);
         }
         finally {
             setLoading(false);
@@ -52,8 +47,28 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
     return (
         <Modal
             isOpen={isOpen}
-            onRequestClose={onclose}
-            style={{overlay: {backgroundColor: 'rgba(0, 0, 0, 0.65)', zIndex: 1000,}, content: {top: '50%', left: '50%', right: 'auto', bottom: 'auto', marginRight: '-50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: '400px', padding: '2rem', borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',},}}>
+            onRequestClose={onClose}
+            style={{
+                overlay: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.65)', 
+                    zIndex: 1000,
+                }, 
+                content: {
+                    top: '50%', 
+                    left: '50%', 
+                    right: 'auto', 
+                    bottom: 'auto', 
+                    marginRight: '-50%', 
+                    transform: 'translate(-50%, -50%)', 
+                    width: '90%', 
+                    maxWidth: '400px', 
+                    padding: '2rem', 
+                    borderRadius: '12px', 
+                    border: 'none', 
+                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
+                },
+            }}
+        >
                 <h2 style={{margin: '0 0 1.5rem 0', textAlign: 'center'}}>Вход в аккаунт</h2>
 
                 {error && (
@@ -102,16 +117,16 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
                     </div>
 
                     <div style={{display: 'flex', gap: '1rem', justifyContent: 'flex-end'}}>
-                        <button type='button' onClick={onClose} disabled={loading} style={{flex: 1, padding: '0.8rem', background: '#6c757d', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer',}}>
+                        <button type='button' onClick={onClose} disabled={loading} style={{flex: 1, padding: '0.8rem', background: '#6c757d', color: 'white', border: 'none', borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer',}}>
                             Отмена
                         </button>
-                        <button type='submit' disabled={loading} style={{flex: 1, padding: '0.8rem', background: '#007bff', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer',}}>
+                        <button type='submit' disabled={loading} style={{flex: 1, padding: '0.8rem', background: loading ? '#6c757d' : '#007bff', color: 'white', border: 'none', borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer',}}>
                             {loading ? 'Вход...' : 'Войти'}
                         </button>
                     </div>
                 </form>
         </Modal>
-    )
+    );
 }
 
 export default Login;

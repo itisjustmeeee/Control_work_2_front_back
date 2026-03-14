@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './styles/ProductCard.module.scss';
+import { useAuth } from './context/AuthContext';
 
 function ProductList({
   products,
   onEdit,
   onDelete,
-  onAdd,
-  token
+  onAdd
 }) {
   const [searchId, setSearchId] = useState('');
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
 
   const filteredProducts = searchId.trim()
     ? products.filter(p => String(p.id) === searchId.trim())
@@ -71,29 +73,23 @@ function ProductList({
       </div>
 
       {/* Кнопка добавления*/}
-      <button
-        className={`${styles.onAdd} onAdd`}
-        onClick={() => {
-          if (!token) {
-            alert('Войдите в аккаунт, чтобы добавить товар');
-            return;
-          }
-          onAdd();
-        }}
-        disabled={!token}
-        style={{
-          padding: '0.7rem 1.4rem',
-          marginBottom: '2rem',
-          background: '#007bff',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          opacity: token ? 1 : 0.6
-        }}
-      >
-        + Добавить товар
-      </button>
+      { isAuthenticated && (
+        <button
+          className={`${styles.onAdd} onAdd`}
+          onClick={onAdd}
+          style={{
+            padding: '0.7rem 1.4rem',
+            marginBottom: '2rem',
+            background: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+          }}
+        >
+          + Добавить товар
+        </button>
+      )}
 
       {/* Список товаров */}
       {filteredProducts.length === 0 && searchId ? (
@@ -140,36 +136,27 @@ function ProductList({
                 </span>
               </p>
 
-              <div style={{ marginTop: '1rem' }}>
-                <button
-                  className={`${styles.edit} edit`}
-                  onClick={() => {
-                    if (!token) {
-                      alert('Войдите в аккаунт, чтобы редактировать товар');
-                      return;
-                    }
-                    onEdit(product);
-                  }}
-                  disabled={!token}
-                  style={{ opacity: token ? 1 : 0.6 }}
-                >
-                  Редактировать
-                </button>
-                <button
-                  className={`${styles.delete} delete`}
-                  onClick={() => {
-                    if (!token) {
-                      alert('Войдите в аккаунт, чтобы удалить товар');
-                      return;
-                    }
-                    onDelete(product.id);
-                  }}
-                  disabled={!token}
-                  style={{ marginLeft: '0.8rem', opacity: token ? 1 : 0.6 }}
-                >
-                  Удалить
-                </button>
-              </div>
+              {isAuthenticated ? (
+                <div style={{ marginTop: '1rem' }}>
+                  <button
+                    className={`${styles.edit} edit`}
+                    onClick={() => onEdit(product)}
+                  >
+                    Редактировать
+                  </button>
+                  <button
+                    className={`${styles.delete} delete`}
+                    onClick={() => onDelete(product.id)}
+                    style={{marginLeft: '0.8rem'}}
+                  >
+                    Удалить
+                  </button>
+                </div>
+              ) : (
+                <small style={{color: '#888', display: 'block', marginTop: '0.5rem'}}>
+                  Войдите, чтобы редактировать и удалять товар
+                </small>
+              )}
             </div>
           ))}
         </div>

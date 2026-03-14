@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 const { nanoid } = require('nanoid');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -11,6 +12,9 @@ const swaggerUi = require('swagger-ui-express');
 const app = express();
 const port = 5000;
 const jwt_secret = "roof_access_denied";
+const refresh_secret = "get_the_axe";
+
+const refreshTokens = new Set();
 
 const authMiddleware = (req, res, next) => {
   const header = req.headers['authorization'];
@@ -141,7 +145,25 @@ const swaggerOptions = {
   apis: [__filename],
 };
 
+function saveUsers() {
+  try {
+    fs.writeFileSync('users.json', JSON.stringify(users, null, 2));
+  } catch (err) {
+    console.error('Ошибка записи users.json: ', err);
+  }
+}
+
 let users = [];
+
+try {
+  if (fs.existsSync('users.json')) {
+    const fileContent = fs.readFileSync('users.json', 'utf8');
+    users = JSON.parse(fileContent);
+  }
+} catch (err) {
+  console.error('Ошибка чтения users.json: ', err);
+  users = [];
+}
 
 async function hash_password(password) {
   const rounds = 12;
@@ -150,6 +172,32 @@ async function hash_password(password) {
 
 async function verify_password(password, passwordHash) {
   return bcrypt.compare(password, passwordHash);
+}
+
+function generate_access_token(user) {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name
+    },
+    jwt_secret,
+    { expiresIn: '60m'}
+  );
+}
+
+function generate_refresh_token(user) {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name
+    },
+    refresh_secret,
+    { expiresIn: '48h'}
+  );
 }
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -264,6 +312,7 @@ app.post('/authentication/registration', async (req, res) => {
   };
 
   users.push(new_user);
+  saveUsers();
 
   const safe_user = {
     id: new_user.id,
@@ -346,7 +395,7 @@ app.post('/authentication/login', async (req, res) => {
   }
 
   if (!user.password) {
-    console.error(`Пользователь ${email} без пароля в базе!`);
+    console.error(`Пользователь ${email} без пароля в базе`);
     return res.status(500).json({ error: "Ошибка сервера: пользователь повреждён" });
   }
 
@@ -355,21 +404,117 @@ app.post('/authentication/login', async (req, res) => {
     res.status(401).json({error: "Неверный email или пароль"});
   }
 
-  const accessToken = jwt.sign(
-    {
+  const accessToken = generate_access_token(user);
+  const refreshToken = generate_refresh_token(user);
+
+  refreshTokens.add(refreshToken);
+
+  res.json({
+    login: true,
+    accessToken,
+    refreshToken,
+    user: {
       id: user.id,
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name
-    },
-    jwt_secret,
-    { expiresIn: '24h' }
-  );
-
-  res.status(200).json({
-    login: true,
-    token: accessToken,
+    }
   });
+});
+
+/**
+ * @swagger
+ * /authentication/refresh:
+ *  post:
+ *    summary: Создание нового refresh токена
+ *    tags: [Authentication]
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            required: 
+ *              - refreshToken
+ *            properties:
+ *              refreshToken:
+ *                type: string
+ *                example: $2b$10$kO6Hq7ZKfV4cPzGm8u7mEuR7r4Xx2p9mP0q3t1yZbCq9Lh5a8b1QW
+ *    responses:
+ *      200:
+ *        description: Новая пара токенов
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                accessToken:
+ *                  type: string
+ *                  example: $2b$10$kO6Hq7ZKfV4cPzGm8u7mEuR7r4Xx2p9mP0q3t1yZbCq9Lh5a8b1QW
+ *                refreshToken:
+ *                  type: string
+ *                  example: $2b$10$kO6Hq7ZKfV4cPzGm8u7mEuR7r4Xx2p9mP0q3t1yZbCq9Lh5a8b1QW
+ *      400:
+ *        description: Необходим refresh токен
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Error'
+ *      401:
+ *        description: Не валидный или просроченный refresh токен
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Error'
+ *      404:
+ *        description: Пользователь не найден
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Error'
+ *      500:
+ *        description: Внутренняя ошибка сервера
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Error'
+ */
+
+app.post('/authentication/refresh', (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({error: "Необходим refresh токен"});
+  }
+
+  if (!refreshTokens.has(refreshToken)) {
+    return res.status(401).json({error: "Не валидный refresh токен"});
+  }
+
+  try {
+    const payload = jwt.verify(refreshToken, refresh_secret);
+
+    const user = users.find((u) => u.id === payload.id);
+    if (!user) {
+      return res.status(404).json({error: "Пользователь не найден"});
+    }
+
+    refreshTokens.delete(refreshToken);
+
+    const newAccessToken = generate_access_token(user);
+    const newRefreshToken = generate_refresh_token(user);
+
+    refreshTokens.add(newRefreshToken);
+
+    res.json({
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken
+    });
+  }
+  catch (err) {
+    console.error('Ошибка верификации refresh токена: ', err.name, err.message);
+    res.status(401).json({error: "Токен не валиден или просрочен"});
+  }
 });
 
 /**
