@@ -1,16 +1,11 @@
 [
   {
-    "id": "N18q0DV0jt",
-    "email": "asa@mail.ru",
-    "first_name": "Ui",
-    "last_name": "Qin",
-    "password": "$2b$12$ew0vlkfYijsZOEHVL7kB8./7k8nt4fQf2EDzFK9H9Y7Yia4ZodOJi"
-  },
-  {
-    "id": "cLM4YYCeqj",
+    "id": "SEZtmD2TWx",
     "email": "sas@mail.ru",
     "first_name": "Alex",
     "last_name": "Bobr",
-    "password": "$2b$12$OukzbcvgmKCcc1V7Siy4Ie0G9AMISsLWtE/xEjgEUgeJx9W6eJprS"
+    "password": "$2b$12$gOvT//xpi42XLKSL5A1E6uYFSY.h8AXI7Q3iZO1oNjn3YXwqK1xci",
+    "role": "admin",
+    "blocked": false
   }
 ]
