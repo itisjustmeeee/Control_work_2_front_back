@@ -15,10 +15,10 @@
 ## Использованные языки
 
 > [!IMPORTANT]
-> - <span style="color:yellow">JavaScript</span>
-> - <span style="color:purple">CSS</span>
-> - <span style="color:green">SCSS</span>
-> - <span style="color:red">HTML</span>
+- <span style="color:yellow">JavaScript</span>
+- <span style="color:purple">CSS</span>
+- <span style="color:green">SCSS</span>
+- <span style="color:red">HTML</span>
 
 ## Установка и запуск проекта
 
