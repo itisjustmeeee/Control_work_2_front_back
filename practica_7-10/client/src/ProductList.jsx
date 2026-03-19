@@ -73,13 +73,13 @@ function ProductList({
       </div>
 
       {/* Кнопка добавления*/}
-      { isAuthenticated && (
+      { isAuthenticated && (user?.role === 'seller' || user?.role === 'admin') ? (
         <button
           className={`${styles.onAdd} onAdd`}
           onClick={onAdd}
           style={{
             padding: '0.7rem 1.4rem',
-            marginBottom: '2rem',
+            marginBottom: '1.4rem',
             background: '#007bff',
             color: 'white',
             border: 'none',
@@ -89,6 +89,10 @@ function ProductList({
         >
           + Добавить товар
         </button>
+      ): (
+        <small style={{color: '#888', display: 'block', marginTop: '0.5rem', marginBottom: '1.2rem'}}>
+          Чтобы создавать товар, вы должны быть админом или продавцом
+        </small>
       )}
 
       {/* Список товаров */}
@@ -136,7 +140,7 @@ function ProductList({
                 </span>
               </p>
 
-              {isAuthenticated ? (
+              {(isAuthenticated && user?.role === 'seller') ? (
                 <div style={{ marginTop: '1rem' }}>
                   <button
                     className={`${styles.edit} edit`}
@@ -144,6 +148,14 @@ function ProductList({
                   >
                     Редактировать
                   </button>
+                </div>
+              ) : (
+                <small style={{color: '#888', display: 'block', marginTop: '0.5rem'}}>
+                  Чтобы редактировать товар, вы должный быть продавцом
+                </small>
+              )}
+              {(isAuthenticated && user?.role === 'admin') ? (
+                <div style={{ marginTop: '1rem' }}>
                   <button
                     className={`${styles.delete} delete`}
                     onClick={() => onDelete(product.id)}
@@ -154,7 +166,7 @@ function ProductList({
                 </div>
               ) : (
                 <small style={{color: '#888', display: 'block', marginTop: '0.5rem'}}>
-                  Войдите, чтобы редактировать и удалять товар
+                  Чтобы удалить товар, вы должны быть админом
                 </small>
               )}
             </div>

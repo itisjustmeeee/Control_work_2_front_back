@@ -12,11 +12,18 @@ function Registration({ isOpen, onClose }) {
     const [first_name, set_first_name] = useState('');
     const [last_name, set_last_name] = useState('');
     const [password, setPassword] = useState('');
+    const [role, setRole] = useState('');
     const [error, setError] = useState(null);
     const [ loading, setLoading ] = useState(false);
 
-    const handleRegistr = async () => {
+    const handleRegister = async () => {
         setError(null);
+
+        if (password.length < 6) {
+            setError("Пароль слишком короткий (минимум 6 символов)");
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -25,23 +32,20 @@ function Registration({ isOpen, onClose }) {
                 first_name,
                 last_name,
                 password,
+                role
             });
 
             const data = response.data;
 
-            if (response.ok) {
-                if (data.accessToken && data.refreshToken) {
-                    login(data.accessToken, data.refreshToken, {
-                        id: data.id || data.user?.id,
-                        email: data.email || data.user?.email,
-                        first_name: data.first_name || data.user?.first_name,
-                        last_name: data.last_name || data.user?.last_name
-                    });
-                }
-                onClose();
-            } else {
-                Error(data.error ||  `Ошибка регистрации (${response.status})`);
+            if (data.accessToken) {
+                login(data.accessToken, data.refreshToken, data.user);
             }
+            onClose();
+            setEmail('');
+            set_first_name('');
+            set_last_name('');
+            setPassword('');
+            setRole('');
         }
         catch (err) {
             const errorMsg = err.response?.data?.error || err.message || 'Сетевая ошибка';
@@ -77,28 +81,34 @@ function Registration({ isOpen, onClose }) {
                 },
             }}
         >
-                <h2 style={{margin: '0 0 1.5 rem 0', textAlign: 'Center'}}>Регистрация</h2>
+                <h2 style={{margin: '0 0 1.5rem 0', textAlign: 'сenter'}}>Регистрация</h2>
 
                 {error && <p style={{color: 'red', marginBottom: '1rem', textAlign: 'center'}}>{error}</p>}
 
-                <form onSubmit={(e) => {e.preventDefault(); handleRegistr();}}>
+                <form onSubmit={(e) => {e.preventDefault(); handleRegister();}}>
                     <div style={{marginBottom: '1rem'}}>
                         <label style={{display: 'block', marginBottom: '0.4rem'}}>Почта</label>
-                        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                        <input type="email" disabled={loading} placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc' }}/>
                     </div>
                     <div style={{marginBottom: '1rem'}}>
                         <label style={{display: 'block', marginBottom: '0.4rem'}}>Имя</label>
-                        <input type="text" placeholder="Имя" value={first_name} onChange={(e) => set_first_name(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc'}}/>
+                        <input type="text" disabled={loading} placeholder="Имя" value={first_name} onChange={(e) => set_first_name(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc'}}/>
                     </div>
                     <div style={{marginBottom: '1rem'}}>
                         <label style={{display: 'block', marginBottom: '0.4rem'}}>Фамилия</label>
-                        <input type="text" placeholder="Фамилия" value={last_name} onChange={(e) => set_last_name(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc'}}/>
+                        <input type="text" disabled={loading} placeholder="Фамилия" value={last_name} onChange={(e) => set_last_name(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc'}}/>
+                    </div>
+                    <div style={{marginBottom: '1rem'}}>
+                        <label style={{display: 'block', marginBottom: '0.4rem'}}>Роль</label>
+                        <select value={role} disabled={loading} onChange={(e) => setRole(e.target.value)} style={{width: '100%', padding: '0.6rem', borderRadius: '6px'}}>
+                            <option value='user'>Пользователь</option>
+                            <option value='seller'>Продавец</option>
+                        </select>
                     </div>
                     <div style={{marginBottom: '1.5rem'}}>
                         <label style={{display: 'block', marginBottom: '0.4rem'}}>Пароль</label>
-                        <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc'}}/>
+                        <input type="password" disabled={loading} placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc'}}/>
                     </div>
-
                     <div style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
                         <button type="button" onClick={onClose} disabled={loading} style={{flex: 1, padding: '0.8rem', background: '#6c757d', color: 'white', border: 'none', borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer',}}>
                             Отмена

@@ -21,21 +21,20 @@ api.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const refreshResponse = await api.post('/authentication/refresh', {}, {
-                    headers: {Authorization: `Bearer ${localStorage.getItem('refreshToken')}`}
+                const refreshResponse = await api.post('/authentication/refresh', {
+                    refreshToken: localStorage.getItem('refreshToken')
                 });
 
-                const {accessToken: newAccess, refreshToken: newRefresh} = refreshResponse.data;
+                const {accessToken, refreshToken} = refreshResponse.data;
 
-                localStorage.setItem('accessToken', newAccess);
-                localStorage.setItem('refreshToken', newRefresh);
+                localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
 
                 originalRequest.headers.Authorization = `Bearer ${newAccess}`;
                 return api(originalRequest);
             } catch (refreshErr) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                window.location.href = '/';
+                localStorage.clear();
+                window.location.href = '/login';
             }
         }
 

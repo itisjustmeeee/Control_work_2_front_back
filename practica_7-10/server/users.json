@@ -7,5 +7,23 @@
     "password": "$2b$12$gOvT//xpi42XLKSL5A1E6uYFSY.h8AXI7Q3iZO1oNjn3YXwqK1xci",
     "role": "admin",
     "blocked": false
+  },
+  {
+    "id": "TU_1sOb0qy",
+    "email": "asa@mail.ru",
+    "first_name": "Oli",
+    "last_name": "Frac",
+    "password": "$2b$12$fV.T2cnlnUxjh3mNHgownenoLxxvJe9cAs9N6YXixngVlNA90wIqK",
+    "role": "user",
+    "blocked": false
+  },
+  {
+    "id": "IDzIday1Wa",
+    "email": "lol@mail.ru",
+    "first_name": "Fa",
+    "last_name": "Li",
+    "password": "$2b$12$33IrTvWI2.0apx132xFqY.P2iABLi2VfCU75MIZO8CytrcQozUeH6",
+    "role": "seller",
+    "blocked": false
   }
 ]

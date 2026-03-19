@@ -16,6 +16,12 @@ function Login({ isOpen, onClose }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
+
+        if (!email || !password) {
+            setError("Введите email и пароль");
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -26,17 +32,22 @@ function Login({ isOpen, onClose }) {
 
             const data = response.data;
 
-            login(data.accessToken, data.refreshToken, {
-                id: data.id || data.user?.id,
-                email: data.email || data.user?.email,
-                first_name: data.first_name || data.user?.first_name,
-                last_name: data.last_name || data.user?.last_name
-            });
+            if (!data.accessToken || !data.refreshToken ||!data.user) {
+                throw new Error("Некорректный ответ сервера");
+            }
 
+            login(data.accessToken, data.refreshToken, data.user);
+
+            setEmail('');
+            setPassword('');
             onClose();
         }
         catch (err) {
-            const errorMsg = err.response?.data?.error || err.message || 'Ошибка входа';
+            const errorMsg = 
+                err.response?.data?.error ||
+                err.response?.data?.message ||
+                err.message ||
+                'Ошибка входа';
             setError(errorMsg);
         }
         finally {
@@ -82,9 +93,13 @@ function Login({ isOpen, onClose }) {
                         </label>
                         <input 
                             type="email"
+                            disabled={loading}
                             placeholder='Введите email'
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                setError(null);
+                            }}
                             required
                             style={{
                                 width: '100%',
@@ -102,9 +117,13 @@ function Login({ isOpen, onClose }) {
                         </label>
                         <input 
                             type='password'
-                            placeholder='введите пароль'
+                            disabled={loading}
+                            placeholder='Введите пароль'
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                setError(null);
+                            }}
                             required
                             style={{
                                 width: '100%',

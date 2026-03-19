@@ -380,7 +380,7 @@ app.post('/authentication/registration', async (req, res) => {
 
   const allowedRoles = [ROLES.USER, ROLES.SELLER];
 
-  const userRole = allowedRoles.includes(req.user.role) ? req.user.role : ROLES.USER;
+  const userRole = allowedRoles.includes(role) ? role : ROLES.USER;
 
   const hashedPassword = await hash_password(password);
 
@@ -406,7 +406,9 @@ app.post('/authentication/registration', async (req, res) => {
     last_name: new_user.last_name,
     role: new_user.role
   };
-  res.status(201).json(safe_user);
+  res.status(201).json({
+    user: safe_user
+  });
 });
 
 /**
@@ -496,6 +498,13 @@ app.post('/authentication/login', async (req, res) => {
 
   const accessToken = generate_access_token(user);
   const refreshToken = generate_refresh_token(user);
+  const safe_user = {
+    id: user.id,
+    email: user.email,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    role: user.role
+  };
 
   refreshTokens.add(refreshToken);
 
@@ -503,13 +512,7 @@ app.post('/authentication/login', async (req, res) => {
     login: true,
     accessToken,
     refreshToken,
-    user: {
-      id: user.id,
-      email: user.email,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      role: user.role
-    }
+    user: safe_user
   });
 });
 
@@ -644,7 +647,7 @@ app.get('/users', authMiddleware, roleMiddleware([ROLES.ADMIN]), (req, res) => {
  * @swagger
  * /users/{id}:
  *  get:
- *    summary: Нахождение продукта по id
+ *    summary: Нахождение пользователя по id
  *    security:
  *      - bearerAuth: []
  *    tags: [Users]

@@ -8,13 +8,22 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Profile from './Profile';
 import Header from './Header';
 import api from './api';
+import UsersList from './UsersList';
 
-function ProtectedRoute({children}) {
+function ProtectedRoute({children, role}) {
   const {user, loading} = useAuth();
 
   if (loading) return <div style={{textAlign: 'center', padding: '4rem'}}>Загрузка...</div>
 
-  return user ? children : <Navigate to="/" replace/>;
+  if (!user) {
+    return <Navigate to='/' replace/>
+  }
+
+  if (role && user.role !== role) {
+    return <Navigate to='/' replace/>
+  }
+
+  return children;
 }
 
 function App() {
@@ -49,7 +58,7 @@ function App() {
 // изменение продукта
   const updateProduct = async (id, updatedProduct) => {
     console.log('Id товара для обновления: ', id);
-    console.log('Данные, которые отправляем: ', updateProduct);
+    console.log('Данные, которые отправляем: ', updatedProduct);
     try {
       const response = await api.put(`/products/${id}`, updatedProduct);
       setProducts(products.map(p => (p.id === id ? response.data : p)));
@@ -114,6 +123,15 @@ function App() {
                   onDelete={deleteProduct}
                   onAdd={openAddProduct}
                 />
+              }
+            />
+
+            <Route
+              path='/users'
+              element={
+                <ProtectedRoute role='admin'>
+                  <UsersList />
+                </ProtectedRoute>
               }
             />
 

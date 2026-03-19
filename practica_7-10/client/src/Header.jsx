@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import { useAuth } from "./context/AuthContext";
 import Registration from './RegistrPage';
 import Login from './LoginPage';
 
 function Header() {
-    const {user, logout} = useAuth();
+    const {user, logout, users} = useAuth();
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -14,6 +14,20 @@ function Header() {
         <header style={{margin: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
             <h1 style={{marginLeft: '0.1rem'}}>Electronics Store</h1>
             <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                {user?.role === 'admin' && (
+                    <Link
+                        to='/users'
+                            style={{
+                                display: 'block',
+                                padding: '0.5rem 0.8rem',
+                                textDecoration: 'none',
+                                color: '#333',
+                                borderBottom: '1px solid #eee'
+                            }}
+                        >
+                            Пользователи
+                        </Link>
+                    )}
                 {user ? (
                     <div style={{position: 'relative'}}>
                         <button
