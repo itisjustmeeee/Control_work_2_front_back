@@ -14,11 +14,12 @@
 
 ## Использованные языки
 
-> [!IMPORTANT]
-> <span style="color:yellow">JavaScript</span>
-> <span style="color:purple">CSS</span>
-> <span style="color:green">SCSS</span>
-> <span style="color:red">HTML</span>
+| Language |
+|----------|
+| ![JS](https://img.shields.io/badge/JavaScript-yellow) |
+| ![CSS](https://img.shields.io/badge/CSS-blue) |
+| ![SCSS](https://img.shields.io/badge/SCSS-pink) |
+| ![HTML](https://img.shields.io/badge/HTML-red) |
 
 ## Установка и запуск проекта
 
