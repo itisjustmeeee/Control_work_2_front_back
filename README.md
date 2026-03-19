@@ -14,7 +14,7 @@
 
 ## Использованные языки
 
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=itisjustmeeee&layout=compact&langs_count=6)
+![Languages](https://img.shields.io/github/languages/count/itisjustmeeee/Control_work_2_front_back.git)
 
 ## Установка и запуск проекта
 
