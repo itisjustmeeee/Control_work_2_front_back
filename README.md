@@ -14,7 +14,7 @@
 
 ## Использованные языки
 
-[![Top Langs](https://github-readme-stats.vercel.app)](https://github.com/itisjustmeeee/github-readme-stats)
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=itisjustmeeee&layout=compact&langs_count=6)
 
 ## Установка и запуск проекта
 
