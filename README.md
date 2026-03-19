@@ -48,16 +48,16 @@ yarn run start
 - [practica_7-10/server/index.js](practica_7-10/server/index.js): файл, инициализирующий работу сервера
 - [practica_7-10/server/users.json](practica_7-10/server/users.json): файл с сохраненными пользователями
 - [practica_7-10/client/src](practica_7-10/client/src): папка с основными файлами фронэнда
-- [practica_7-10/client/App.jsx](practica_7-10/client/App.jsx): основной файл приложения
-- [practica_7-10/client/Header.jsx](practica_7-10/client/Header.jsx): файл с шапкой проекта + регистрация / вход + просмотр списка пользователей у админа
-- [practica_7-10/client/LoginPage.jsx](practica_7-10/client/LoginPage.jsx): файл с модалкой логина пользователя
-- [practica_7-10/client/ProductDetail.jsx](practica_7-10/client/ProductDetail.jsx): файл с карточкой продукта
-- [practica_7-10/client/ProductForm.js](practica_7-10/client/ProductForm.js): файл с формой для создания нового продукта
-- [practica_7-10/client/ProductList.jsx](practica_7-10/client/ProductList.jsx): файл со списком товаров
-- [practica_7-10/client/Profile.jsx](practica_7-10/client/Profile.jsx): файл с профилем пользователя
-- [practica_7-10/client/RegistrPage.jsx](practica_7-10/client/RegistrPage.jsx): файл с модалкой регистрации пользователя
-- [practica_7-10/client/UserDetail.jsx](practica_7-10/client/UserDetail.jsx): файл с карточкой пользователя в списке
-- [practica_7-10/client/UsersList.jsx](practica_7-10/client/UsersList.jsx): файл со списком пользователей
+- [practica_7-10/client/App.jsx](practica_7-10/client/src/App.jsx): основной файл приложения
+- [practica_7-10/client/Header.jsx](practica_7-10/client/src/Header.jsx): файл с шапкой проекта + регистрация / вход + просмотр списка пользователей у админа
+- [practica_7-10/client/LoginPage.jsx](practica_7-10/client/src/LoginPage.jsx): файл с модалкой логина пользователя
+- [practica_7-10/client/ProductDetail.jsx](practica_7-10/client/src/ProductDetail.jsx): файл с карточкой продукта
+- [practica_7-10/client/ProductForm.js](practica_7-10/client/src/ProductForm.js): файл с формой для создания нового продукта
+- [practica_7-10/client/ProductList.jsx](practica_7-10/client/src/ProductList.jsx): файл со списком товаров
+- [practica_7-10/client/Profile.jsx](practica_7-10/client/src/Profile.jsx): файл с профилем пользователя
+- [practica_7-10/client/RegistrPage.jsx](practica_7-10/client/src/RegistrPage.jsx): файл с модалкой регистрации пользователя
+- [practica_7-10/client/UserDetail.jsx](practica_7-10/client/src/UserDetail.jsx): файл с карточкой пользователя в списке
+- [practica_7-10/client/UsersList.jsx](practica_7-10/client/src/UsersList.jsx): файл со списком пользователей
 
 ## Аспекты, на которые стоит обратить внимание
 
