@@ -14,7 +14,7 @@
 
 ## Использованные языки
 
-![Languages](https://img.shields.io/github/languages/count/itisjustmeeee/Control_work_2_front_back.git)
+![Languages](https://img.shields.io/github/languages/count/itisjustmeeee/Control_work_2_front_back)
 
 ## Установка и запуск проекта
 
