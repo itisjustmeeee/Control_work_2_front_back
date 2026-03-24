@@ -9,6 +9,7 @@ function ProductForm({ isOpen, onSubmit, initialData, onCancel }) {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [stock, setStock] = useState(0);
+  const [image, setImage] = useState('');
 
   useEffect(() => {
     if (initialData) {
@@ -17,6 +18,7 @@ function ProductForm({ isOpen, onSubmit, initialData, onCancel }) {
       setDescription(initialData.description);
       setPrice(initialData.price);
       setStock(initialData.stock);
+      setImage(initialData?.image || '');
     }
     else {
       setName('');
@@ -24,12 +26,13 @@ function ProductForm({ isOpen, onSubmit, initialData, onCancel }) {
       setDescription('');
       setPrice(0);
       setStock(0);
+      setImage('');
     }
   }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ name, category, description, price: parseFloat(price), stock: parseInt(stock, 10),});
+    onSubmit({ name, category, description, price: parseFloat(price), stock: parseInt(stock, 10), image});
   };
 
   return (
@@ -70,6 +73,19 @@ function ProductForm({ isOpen, onSubmit, initialData, onCancel }) {
             Количество на складе:
           </label>
           <input type="number" value={stock} onChange={(e) => setStock(e.target.value)} required style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc'}}/>
+        </div>
+        <div style={{marginBottom: '1rem'}}>
+          <label style={{display: 'block', marginBottom: '0.4rem'}}>
+            URL изображения:
+          </label>
+          <input
+            type='text'
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            onError={(e) => {e.target.src = 'https://via.placeholder.com/200';}}
+            placeholder='http://localhost:5000/images/iPhone 14.jpeg'
+            style={{width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ccc'}}
+          />
         </div>
         <div style={{display: 'flex', justifyContent: 'space-between', gap: '1rem'}}>
           <button type="button" onClick={onCancel} style={{flex: 1, padding: '0.8rem', background: '#6c757d', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer',}}>

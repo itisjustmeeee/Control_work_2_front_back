@@ -119,6 +119,22 @@ function ProductList({
         <div>
           {filteredProducts.map(product => (
             <div key={product.id} className={styles.card}>
+              {product.image && (
+                <img 
+                  src={
+                    product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`
+                  }
+                  alt={product.name}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    objectFit: 'contain',
+                    borderRadius: '8px',
+                    marginBottom: '1rem'
+                  }}
+                  onError={(e) => {e.target.src = 'https://via.placeholder.com/300x200'}}
+                />
+              )}
               <h3>
                 <Link
                   to={`/product/${product.id}`}

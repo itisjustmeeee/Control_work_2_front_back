@@ -70,6 +70,7 @@ function roleMiddleware(roles = []) {
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
+app.use('/images', express.static('images'));
 
 // Логирование запросов
 app.use((req, res, next) => {
@@ -84,17 +85,17 @@ app.use((req, res, next) => {
 
 // Создание базовых 11 продуктов
 let products = [
-  { id: 1, name: 'iPhone 14', category: 'Smartphones', description: 'Latest Apple smartphone with A15 chip.', price: 999, stock: 50 },
-  { id: 2, name: 'Samsung Galaxy S23', category: 'Smartphones', description: 'High-end Android phone with Snapdragon processor.', price: 899, stock: 30 },
-  { id: 3, name: 'MacBook Pro', category: 'Laptops', description: 'Powerful laptop for professionals.', price: 1999, stock: 20 },
-  { id: 4, name: 'Dell XPS 13', category: 'Laptops', description: 'Compact ultrabook with InfinityEdge display.', price: 1299, stock: 15 },
-  { id: 5, name: 'Sony WH-1000XM5', category: 'Headphones', description: 'Noise-cancelling over-ear headphones.', price: 399, stock: 100 },
-  { id: 6, name: 'AirPods Pro', category: 'Headphones', description: 'Wireless earbuds with active noise cancellation.', price: 249, stock: 80 },
-  { id: 7, name: 'Google Pixel Watch', category: 'Smartwatches', description: 'Wear OS smartwatch with Fitbit integration.', price: 349, stock: 40 },
-  { id: 8, name: 'Apple Watch Series 8', category: 'Smartwatches', description: 'Advanced health tracking smartwatch.', price: 399, stock: 60 },
-  { id: 9, name: 'Kindle Paperwhite', category: 'E-readers', description: 'Waterproof e-reader with high-resolution display.', price: 129, stock: 200 },
-  { id: 10, name: 'Nintendo Switch', category: 'Gaming Consoles', description: 'Hybrid gaming console for home and portable play.', price: 299, stock: 25 },
-  { id: 11, name: 'PlayStation 5', category: 'Gaming Consoles', description: 'Next-gen console with ray tracing.', price: 499, stock: 10 }
+  { id: 1, name: 'iPhone 14', category: 'Smartphones', description: 'Latest Apple smartphone with A15 chip.', price: 999, stock: 50, image: '/images/iPhone 14.jpeg' },
+  { id: 2, name: 'Samsung Galaxy S23', category: 'Smartphones', description: 'High-end Android phone with Snapdragon processor.', price: 899, stock: 30, image: '/images/Samsung Galaxy S23.jpg' },
+  { id: 3, name: 'MacBook Pro', category: 'Laptops', description: 'Powerful laptop for professionals.', price: 1999, stock: 20, image: '/images/MacBook Pro.jpg' },
+  { id: 4, name: 'Dell XPS 13', category: 'Laptops', description: 'Compact ultrabook with InfinityEdge display.', price: 1299, stock: 15, image: '/images/Dell XPS 13.webp' },
+  { id: 5, name: 'Sony WH-1000XM5', category: 'Headphones', description: 'Noise-cancelling over-ear headphones.', price: 399, stock: 100, image: '/images/Sony WH-1000XM5.webp' },
+  { id: 6, name: 'AirPods Pro', category: 'Headphones', description: 'Wireless earbuds with active noise cancellation.', price: 249, stock: 80, image: '/images/AirPods Pro.webp' },
+  { id: 7, name: 'Google Pixel Watch', category: 'Smartwatches', description: 'Wear OS smartwatch with Fitbit integration.', price: 349, stock: 40, image: '/images/Google Pixel Watch.jpg' },
+  { id: 8, name: 'Apple Watch Series 8', category: 'Smartwatches', description: 'Advanced health tracking smartwatch.', price: 399, stock: 60, image: '/images/Apple Watch Series 8.png' },
+  { id: 9, name: 'Kindle Paperwhite', category: 'E-readers', description: 'Waterproof e-reader with high-resolution display.', price: 129, stock: 200, image: '/images/Kindle Paperwhite.png' },
+  { id: 10, name: 'Nintendo Switch', category: 'Gaming Consoles', description: 'Hybrid gaming console for home and portable play.', price: 299, stock: 25, image: '/images/Nintendo Switch.jpg' },
+  { id: 11, name: 'PlayStation 5', category: 'Gaming Consoles', description: 'Next-gen console with ray tracing.', price: 499, stock: 10, image: '/images/PlayStation 5.jpg' }
 ];
 
 let nextId = 12;
@@ -157,6 +158,11 @@ const swaggerOptions = {
               type: 'integer',
               description: 'количество товара на складе',
               example: 500,
+            },
+            image: {
+              type: 'string',
+              description: 'URL изображение товара на сайте',
+              example: '/images/iPhone 14.jpeg',
             },
           },
         },

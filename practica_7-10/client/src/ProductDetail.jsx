@@ -38,6 +38,7 @@ function ProductDetail({ products }) {
           {product.stock} шт.
         </span>
       </p>
+      <img src={`http://localhost:5000${product.image}`} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'cover'}}/>
 
       <div style={{ marginTop: '2rem' }}>
         <Link to="/" style={{
